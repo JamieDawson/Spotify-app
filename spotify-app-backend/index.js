@@ -25,33 +25,6 @@ mongoose
     console.log(error);
   });
 
-app.post("/albums", async (request, response) => {
-  try {
-    if (
-      !request.body.one ||
-      !request.body.two ||
-      !request.body.three ||
-      !request.body.four
-    ) {
-      return response.status(400).send({
-        message: "Send all required fields: one, two, three, and four",
-      });
-    }
-    const newAlbum = {
-      one: request.body.one,
-      two: request.body.two,
-      three: request.body.three,
-      four: request.body.four,
-    };
-    const album = await Albums.create(newAlbum);
-
-    return response.status(201).send(album);
-  } catch (error) {
-    console.log(error.message);
-    response.status(500).send({ message: error.message });
-  }
-});
-
 app.post("/albumsUpdate", async (request, response) => {
   try {
     if (
@@ -86,6 +59,26 @@ app.post("/albumsUpdate", async (request, response) => {
     // Fetch the updated document
     const album = await Albums.findOne(filter);
 
+    return response.status(200).send(album);
+  } catch (error) {
+    console.log(error.message);
+    response.status(500).send({ message: error.message });
+  }
+});
+
+app.get("/getAlbum", async (request, response) => {
+  try {
+    // Extract the ID from the URL parameters
+    const { id } = request.params;
+
+    // Find the document with the given ID
+    const album = await Albums.findOne({ _id: "66a9d1828fb1ffaa63f4ed3c" });
+
+    if (!album) {
+      return response.status(404).send({ message: "Document not found" });
+    }
+
+    // Send the found document as the response
     return response.status(200).send(album);
   } catch (error) {
     console.log(error.message);
