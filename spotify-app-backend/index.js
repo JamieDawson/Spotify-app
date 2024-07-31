@@ -27,32 +27,27 @@ mongoose
 
 app.post("/albumsUpdate", async (request, response) => {
   try {
-    if (
-      !request.body.one ||
-      !request.body.two ||
-      !request.body.three ||
-      !request.body.four
-    ) {
+    const updates = {};
+
+    // Add only the fields that are present in the request body to the updates object
+    if (request.body.one !== undefined) updates.one = request.body.one;
+    if (request.body.two !== undefined) updates.two = request.body.two;
+    if (request.body.three !== undefined) updates.three = request.body.three;
+    if (request.body.four !== undefined) updates.four = request.body.four;
+
+    if (Object.keys(updates).length === 0) {
       return response.status(400).send({
-        message: "Send all required fields: one, two, three, and four",
+        message: "No fields to update",
       });
     }
-    const updatedAlbum = {
-      one: request.body.one,
-      two: request.body.two,
-      three: request.body.three,
-      four: request.body.four,
-    };
 
     // Replace `yourUniqueIdentifier` with the actual identifier you use
     const filter = { _id: "66a9d1828fb1ffaa63f4ed3c" };
 
-    // Update the existing document or create one if it doesn't exist
-    const result = await Albums.updateOne(filter, updatedAlbum, {
-      upsert: true, // This option creates the document if it does not exist
-    });
+    // Update the existing document only; do not create a new document
+    const result = await Albums.updateOne(filter, { $set: updates });
 
-    if (result.matchedCount === 0 && result.upsertedCount === 0) {
+    if (result.matchedCount === 0) {
       return response.status(404).send({ message: "Document not found" });
     }
 
