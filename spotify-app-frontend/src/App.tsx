@@ -3,6 +3,9 @@ import { Spotify } from "react-spotify-embed";
 import axios from "axios";
 import "./App.css";
 
+const CLIENT_ID = import.meta.env.VITE_REACT_APP_CLIENT_ID || "";
+const CLIENT_SECRET = import.meta.env.VITE_REACT_APP_CLIENT_SECRET || "";
+
 type Album = {
   One: string;
   Two: string;
@@ -10,8 +13,8 @@ type Album = {
   Four: string;
 };
 
-const CLIENT_ID = "";
-const CLIENT_SECRET = "";
+// const CLIENT_ID = "";
+// const CLIENT_SECRET = "";
 
 function App() {
   const [albumOne, setAlbumOne] = useState<string>("");
@@ -42,6 +45,7 @@ function App() {
   useEffect(() => {
     const getAccessToken = async () => {
       try {
+        console.log("TESTING THIS" + CLIENT_SECRET);
         const response = await axios.post(
           "https://accounts.spotify.com/api/token",
           "grant_type=client_credentials",
