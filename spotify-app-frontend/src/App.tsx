@@ -7,10 +7,10 @@ const CLIENT_ID = import.meta.env.VITE_REACT_APP_CLIENT_ID || "";
 const CLIENT_SECRET = import.meta.env.VITE_REACT_APP_CLIENT_SECRET || "";
 
 type Album = {
-  One: string;
-  Two: string;
-  Three: string;
-  Four: string;
+  one: string;
+  two: string;
+  three: string;
+  four: string;
 };
 
 // const CLIENT_ID = "";
@@ -21,12 +21,13 @@ function App() {
   const [albumTwo, setAlbumTwo] = useState<string>("");
   const [albumThree, setAlbumThree] = useState<string>("");
   const [albumFour, setAlbumFour] = useState<string>("");
+
   const [allAlbums, setAllAlbums] = useState<Album[]>([
     {
-      One: "https://open.spotify.com/album/0OQwd9OkjGYKjYk4QCJYDB",
-      Two: "https://open.spotify.com/album/0fUy6IdLHDpGNwavIlhEsl",
-      Three: "https://open.spotify.com/album/19t724A9u0hN0Zq2U2hOkJ",
-      Four: "https://open.spotify.com/album/3WZERxTccoes6PHBRn959I",
+      one: "",
+      two: "",
+      three: "",
+      four: "",
     },
   ]);
 
@@ -34,15 +35,17 @@ function App() {
   const [validUrls, setValidUrls] = useState<{
     [key in keyof Album]: boolean | null;
   }>({
-    One: null,
-    Two: null,
-    Three: null,
-    Four: null,
+    one: null,
+    two: null,
+    three: null,
+    four: null,
   });
 
   const [accessToken, setAccessToken] = useState<string>("");
 
+  //Gets access token as soon as the app loads.
   useEffect(() => {
+    console.log("USEEFFECT GET ACCESS TOKEN");
     const getAccessToken = async () => {
       try {
         const response = await axios.post(
@@ -64,12 +67,24 @@ function App() {
   }, []);
 
   useEffect(() => {
+    console.log("USEEFFECT GETALBUMS CALL");
     const fetchAlbum = async () => {
       try {
         const response = await axios.get<Album>(
           "http://localhost:5555/getAlbum"
         );
         console.log(response.data);
+        //console.log(response.data.one.toString());
+
+        let test = [
+          {
+            one: response.data.one,
+            two: response.data.two,
+            three: response.data.three,
+            four: response.data.four,
+          },
+        ];
+        setAllAlbums(test);
       } catch (err) {
         console.log("Failed to fetch album data");
       }
@@ -85,7 +100,7 @@ function App() {
     typedAlbumFromInput: string
   ) => {
     event.preventDefault();
-
+    console.log("UPDATE ALBUMS");
     const isValid = await checkSpotifyUrl(typedAlbumFromInput);
 
     if (isValid) {
@@ -108,6 +123,7 @@ function App() {
   };
 
   const checkSpotifyUrl = async (url: string): Promise<boolean> => {
+    console.log("CHECK SPOTIFY URL");
     try {
       const albumId = url.split("/album/")[1].split("?")[0];
       const response = await axios.get(
@@ -127,8 +143,8 @@ function App() {
   return (
     <div className="container">
       <div className="album">
-        <Spotify link={allAlbums[0].One} />
-        <form onSubmit={(e) => updateAlbums(e, 0, "One", albumOne)}>
+        {allAlbums[0].one && <Spotify link={allAlbums[0].one} />}
+        <form onSubmit={(e) => updateAlbums(e, 0, "one", albumOne)}>
           <input
             className="input-field"
             type="text"
@@ -140,13 +156,13 @@ function App() {
             Update album 1
           </button>
         </form>
-        {validUrls.One === false && (
+        {validUrls.one === false && (
           <p className="error-message">Invalid Spotify URL for Album 1</p>
         )}
       </div>
       <div className="album">
-        <Spotify link={allAlbums[0].Two} />
-        <form onSubmit={(e) => updateAlbums(e, 0, "Two", albumTwo)}>
+        {allAlbums[0].two && <Spotify link={allAlbums[0].two} />}
+        <form onSubmit={(e) => updateAlbums(e, 0, "two", albumTwo)}>
           <input
             className="input-field"
             type="text"
@@ -158,13 +174,13 @@ function App() {
             Update album 2
           </button>
         </form>
-        {validUrls.Two === false && (
+        {validUrls.two === false && (
           <p className="error-message">Invalid Spotify URL for Album 2</p>
         )}
       </div>
       <div className="album">
-        <Spotify link={allAlbums[0].Three} />
-        <form onSubmit={(e) => updateAlbums(e, 0, "Three", albumThree)}>
+        {allAlbums[0].three && <Spotify link={allAlbums[0].three} />}
+        <form onSubmit={(e) => updateAlbums(e, 0, "three", albumThree)}>
           <input
             className="input-field"
             type="text"
@@ -176,13 +192,13 @@ function App() {
             Update album 3
           </button>
         </form>
-        {validUrls.Three === false && (
+        {validUrls.three === false && (
           <p className="error-message">Invalid Spotify URL for Album 3</p>
         )}
       </div>
       <div className="album">
-        <Spotify link={allAlbums[0].Four} />
-        <form onSubmit={(e) => updateAlbums(e, 0, "Four", albumFour)}>
+        {allAlbums[0].four && <Spotify link={allAlbums[0].four} />}
+        <form onSubmit={(e) => updateAlbums(e, 0, "four", albumFour)}>
           <input
             className="input-field"
             type="text"
@@ -194,7 +210,7 @@ function App() {
             Update album 4
           </button>
         </form>
-        {validUrls.Four === false && (
+        {validUrls.four === false && (
           <p className="error-message">Invalid Spotify URL for Album 4</p>
         )}
       </div>
