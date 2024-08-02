@@ -45,7 +45,6 @@ function App() {
   useEffect(() => {
     const getAccessToken = async () => {
       try {
-        console.log("TESTING THIS" + CLIENT_SECRET);
         const response = await axios.post(
           "https://accounts.spotify.com/api/token",
           "grant_type=client_credentials",
@@ -62,6 +61,21 @@ function App() {
       }
     };
     getAccessToken();
+  }, []);
+
+  useEffect(() => {
+    const fetchAlbum = async () => {
+      try {
+        const response = await axios.get<Album>(
+          "http://localhost:5555/getAlbum"
+        );
+        console.log(response.data);
+      } catch (err) {
+        console.log("Failed to fetch album data");
+      }
+    };
+
+    fetchAlbum();
   }, []);
 
   const updateAlbums = async (
