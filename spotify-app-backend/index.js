@@ -1,10 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
 import mongoose from "mongoose";
+import cors from "cors"; // Import the cors package
 import { PORT, mongoDBURL } from "./config.js";
 import { Albums } from "./models/albumsModel.js";
 
 const app = express();
+
+// Use the CORS middleware
+app.use(cors());
 
 // Middleware to parse JSON bodies
 app.use(bodyParser.json());
@@ -63,9 +67,6 @@ app.post("/albumsUpdate", async (request, response) => {
 
 app.get("/getAlbum", async (request, response) => {
   try {
-    // Extract the ID from the URL parameters
-    const { id } = request.params;
-
     // Find the document with the given ID
     const album = await Albums.findOne({ _id: "66a9d1828fb1ffaa63f4ed3c" });
 
@@ -80,5 +81,3 @@ app.get("/getAlbum", async (request, response) => {
     response.status(500).send({ message: error.message });
   }
 });
-
-//E:\Programming\Spotify-app\spotify-app-backend
