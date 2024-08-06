@@ -13,9 +13,6 @@ type Album = {
   four: string;
 };
 
-// const CLIENT_ID = "";
-// const CLIENT_SECRET = "";
-
 function App() {
   const [albumOne, setAlbumOne] = useState<string>("");
   const [albumTwo, setAlbumTwo] = useState<string>("");
@@ -66,6 +63,7 @@ function App() {
     getAccessToken();
   }, []);
 
+  //Runs once when app loads. Gets albums that are currently in backend.
   useEffect(() => {
     console.log("USEEFFECT GETALBUMS CALL");
     const fetchAlbum = async () => {
@@ -73,7 +71,7 @@ function App() {
         const response = await axios.get<Album>(
           "http://localhost:5555/getAlbum"
         );
-        console.log(response.data);
+        // console.log(response.data);
         //console.log(response.data.one.toString());
 
         let test = [
@@ -93,6 +91,41 @@ function App() {
     fetchAlbum();
   }, []);
 
+  //Funciton to send data to the backend.
+  const updateAlbumOnBackend = async (updates: Partial<Album>) => {
+    try {
+      const response = await fetch("http://localhost:5555/albumsUpdate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updates),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const updatedAlbum = await response.json();
+      // console.log("Album updated:", updatedAlbum);
+      return updatedAlbum;
+    } catch (error) {
+      console.error("Failed to update album:", error);
+      throw error;
+    }
+  };
+
+  // const checkListForExistingUrl = (url: string): boolean => {
+  //   // Loop through each album in the allAlbums array
+  //   for (const album of allAlbums) {
+  //     // Check if the URL matches any of the properties in the album
+  //     if (url === album.one || url === album.two || url === album.three || url === album.four) {
+  //       return true; // Return true if a match is found
+  //     }
+  //   }
+  //   return false; // Return false if no match is found
+  // };
+
   const updateAlbums = async (
     event: React.FormEvent,
     index: number,
@@ -100,7 +133,17 @@ function App() {
     typedAlbumFromInput: string
   ) => {
     event.preventDefault();
-    console.log("UPDATE ALBUMS");
+    // console.log("UPDATE ALBUMS");
+
+    typedAlbumFromInput = typedAlbumFromInput.split("?")[0];
+
+    //let alreadyExist = checkListForExistingUrl(typedAlbumFromInput);
+
+    // if (alreadyExist === true) {
+    //   console.log("already exist in list");
+    //   return;
+    // }
+
     const isValid = await checkSpotifyUrl(typedAlbumFromInput);
 
     if (isValid) {
@@ -114,6 +157,18 @@ function App() {
         ...prevValidUrls,
         [albumKey]: true,
       }));
+
+      // Prepare the update payload
+      const updates: Partial<Album> = {
+        [albumKey]: typedAlbumFromInput,
+      };
+
+      // Send the update to the backend
+      try {
+        await updateAlbumOnBackend(updates);
+      } catch (error) {
+        console.error("Error updating album on backend:", error);
+      }
     } else {
       setValidUrls((prevValidUrls) => ({
         ...prevValidUrls,
@@ -123,9 +178,10 @@ function App() {
   };
 
   const checkSpotifyUrl = async (url: string): Promise<boolean> => {
-    console.log("CHECK SPOTIFY URL");
+    // console.log("CHECK SPOTIFY URL");
     try {
       const albumId = url.split("/album/")[1].split("?")[0];
+
       const response = await axios.get(
         `https://api.spotify.com/v1/albums/${albumId}`,
         {
