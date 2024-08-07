@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import cors from "cors"; // Import the cors package
 import { PORT, mongoDBURL } from "./config.js";
 import { Albums } from "./models/albumsModel.js";
-PORT = process.env.PORT || 5555;
 
 const app = express();
 
